@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Magnetic Field</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+		<script src="build/three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Anton|Lobster|Ubuntu" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="style/style.css">
+		
+	</head>
+	<body>
+		<div class = "navbar">
+			<div class = "navbar-title">Magnetic Field</div>
+		</div>
+		<div class="container"></div>
+		<div class="menu">
+			<div class = "content">
+				<h1 style = "font-family: 'Lobster', cursive; font-size: 30px;">Menu</h1>
+				<div class = "wire">
+					<div class = "wire-title">Wire</div>
+
+					<div class = "wire-select">
+						<select class = "wire-select-field">
+							<option value = "0">Choose</option>
+							<option value = "4">4</option>
+							<option value = "5">5</option>
+							<option value = "6">6</option>
+							<option value = "7">7</option>
+							<option value = "8">8</option>
+						</select>
+					</div>
+
+				</div>
+				<div class = "grid">
+					<div class = "grid-title">Grid</div>
+					<div class = "grid-select">
+							<input type = "text" class = "grid-select-field-x" value = "4">
+							<input type = "text" class = "grid-select-field-y" value = "4">
+							<select class = "grid-select-field-z">
+								<option value = "0">Choose Z</option>
+								<option value = "1">1</option>
+								<option value = "2">2</option>
+							</select>
+						</div>
+				</div>
+				<div class = "save-button">
+					<button class = "save">Calculate</button>
+				</div>
+				<div class = "data-collector"></div>
+			</div>
+		</div>
+
+		<script src="script.js"></script>
+	</body>
+</html>
+
+
+<!-- /**
+* Whole logic of Biot-Savart law
+*/
+// function countdB(gridX, gridY, gridZ, wireMidX, wireMidY, wireMidZ, counter,counterOfDL){
+//     let PI = Math.PI;
+//     let r = calculateR(gridX, gridY, gridZ, wireMidX, wireMidY, wireMidZ);
+//     console.log(wireDL[counterOfDL]);
+//     // console.log(middleWireJson);
+// }
+
+// function calculateR(gridX, gridY, gridZ, wireMidX, wireMidY, wireMidZ){
+//     let deltaX = gridX - wireMidX;
+//     let deltaY = gridY - wireMidY;
+//     let deltaZ = gridZ - wireMidZ;
+//     return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+// }
+
+// function setDL(){
+//     let saveLastCoordinate;
+//     wireDL = wireJson.map(function(cord, index){
+//         if(index > 0){
+//             let deltaX = cord.x - saveLastCoordinate.x;
+//             let deltaY = cord.y - saveLastCoordinate.y;
+//             let deltaZ = cord.z - saveLastCoordinate.z;
+//             saveLastCoordinate = cord;
+//             return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+
+//         }
+//         else{
+//             saveLastCoordinate = cord;
+//         }
+//     });
+//     wireDL.shift();
+// } -->
