@@ -108,6 +108,12 @@ font-family: 'Anton', sans-serif;
     font-size:14px;
     border-radius:7px;
 }
+.grid-select-field-z{
+    width:90px;
+    height:33px;
+    font-size:14px;
+    border-radius:7px;
+}
 .save{
     background: none;
     color: inherit;

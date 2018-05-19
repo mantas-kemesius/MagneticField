@@ -5,9 +5,9 @@
      * TODO: Meybe should be changed with more random numbers ?!
      */
     let mainGridJson = [
-        { "x": -60, "y": -60, "z": 50, },
-        { "x": -60, "y": 140, "z": 50, },
-        { "x": 140, "y": 140, "z": 50, }
+        { "x": -60, "y": -60, "z": 100, },
+        { "x": -60, "y": 140, "z": 100, },
+        { "x": 140, "y": 140, "z": 100, }
     ];
 
     /**
@@ -17,62 +17,58 @@
      * In order to make more interesting wire.
      */
     let mainWireJson = [
-        { "x": 0,  "y": 0, "z": 0, },
-        { "x": 0,  "y": 80, "z": 0, },
-        { "x": 80, "y": 80, "z": 0, },
+        { "x": 5,  "y": 5, "z": 10, },
+        { "x": 0,  "y": 80, "z": -10, },
+        { "x": 80, "y": 80, "z": 4, },
         { "x": 80, "y": 0, "z": 0, },
-        { "x": 0,  "y": 0, "z": 0, },
+        { "x": 5,  "y": 5, "z": 10 },
     ];
 //(MAJOR)---------------------- MAIN JSON ARRAYS ------------------------------    
-    let wireJson = [], middleWireJson = [], gridJson = [], wireDL = [];
+    let wireJson = [], middleWireJson = [], gridJson = [], wireDL = [], BMaxArr = [], BMaxArrCount = 0, gridCounter = [];
 //(MAJOR)---------------- MAIN LOGIC OF BIOT-SAVART LAW -----------------------
 
     let gridXValue = 2, gridYValue = 2, gridZValue = 1, wireCordCount = 4;
 
-    /**
-     * Whole logic of Biot-Savart law
-     */
-    function calculateDB(beginX, beginY, beginZ, wireMidX, wireMidY, wireMidZ ,counter, counterOfDL){
-        let PI = Math.PI;
-        let r = calculateR(beginX, beginY, beginZ, wireMidX, wireMidY, wireMidZ);
-
-        return wireDL[counterOfDL] / (4* PI * (r*r));  //FORMULE!
-    }
-
-
     function addCoordinatesToWireMiddle(counter){
         let beginX = gridJson[counter-1].x, beginY = gridJson[counter-1].y, beginZ = gridJson[counter-1].z;
-        let counterOfDL = 0, dB, sumOfdB = 0;
+        let counterOfDL = 0, sumOfdB = 0
+        let dB = {"x":0, "y":0, "z":0}, B = {"x":0, "y":0, "z":0};
         let arrayOfdB = [];
+        let maxX = -99999, maxY = -99999, maxZ = -99999;
+      
         for( let i = 0 ; i < middleWireJson.length; i++ ){
-
-            /** PIESIA LINIJAS NUO MAZGO IKI LAIDININKO VIDURIO KORDINATES **/
-            // gridJson[counter] = {"x": middleWireJson[i].x, "y": middleWireJson[i].y, "z": middleWireJson[i].z};
-            // counter++;
-            // counter = comeBackToBegin(beginX, beginY, beginZ, counter);
-
-            /** ATITINKAMU KORDINACIU SKIRTUMAI (IS MAZGO KORDINACIU ATIMAME LAIDININKO VIDURIO TASKO KORDINATES) **/
-            let x = beginX - middleWireJson[i].x;
-            let y = beginY - middleWireJson[i].y;
-            let z = beginZ - middleWireJson[i].z;
             
-            gridJson[counter] = {"x": x, "y": y, "z": z};
-            counter++;
+            let rx = beginX - middleWireJson[i].x;
+            let ry = beginY - middleWireJson[i].y;
+            let rz = beginZ - middleWireJson[i].z;
 
-            /** GRIZTA I MAZGO KORDINATE **/
-            counter = comeBackToBegin(beginX, beginY, beginZ, counter);
+            let dlx = wireJson[i+1].x - wireJson[i].x; 
+            let dly = wireJson[i+1].y - wireJson[i].y; 
+            let dlz = wireJson[i+1].z - wireJson[i].z; 
+            
+            let rk = (rx*rx+ry*ry+rz*rz);
 
-            /** SKAICIUOJA dB **/
-            dB = calculateDB(beginX, beginY, beginZ, middleWireJson[i].x, middleWireJson[i].y, middleWireJson[i].z, counter, counterOfDL);
-            arrayOfdB.push(dB);
-            /** RENKAMA VISU dB SUMA **/
-            sumOfdB += dB;
+            dB.x = ry*dlz - rz*dly;
+            dB.y = rz*dlx - rx*dlz;
+            dB.z = rx*dly - ry*dlx;
+
+            dB.x /= rk;
+            dB.y /= rk;
+            dB.z /= rk;
+
+            B.x += (dB.x);
+            B.y += (dB.y);
+            B.z += (dB.z);
+
         }
+        
+        gridJson[counter] = {"x": B.x, "y": B.y, "z": B.z};
+        gridCounter.push(counter);
+        counter++;
+        counter = comeBackToBegin(beginX, beginY, beginZ, counter);
 
-        /** SUNORMAVIMAS PAGAL DIDZIAUSIA NARI **/
-        let maxdB = Math.max(...arrayOfdB); 
-        /** DALINAM IS dB SUMOS DIDZIAUSIA NARI **/
-        sumOfdB /= maxdB;
+        BMaxArr[BMaxArrCount] = Math.sqrt((B.x*B.x)+(B.y*B.y)+(B.z*B.z));
+        BMaxArrCount++;
 
         return counter;
     }
@@ -157,12 +153,13 @@
     function setGridCoordinates(){
         if(gridXValue != 0 && gridYValue != 0 && gridZValue != 0){
             let saveLast = {}, counter, counterFirst;
-            let xDiff, yDiff;
+            let xDiff, yDiff, zDiff;
             for (var i = 0; i < mainGridJson.length; i++) {
                 if( i > 0 ){
                     if(saveLast.x != mainGridJson[i].x){
 
-                        xDiff = (mainGridJson[i].x - saveLast.x) / (gridXValue-1);
+                        xDiff = (mainGridJson[i].x - saveLast.x) / (gridXValue-1);    
+                        zDiff = (mainGridJson[i].z + saveLast.z) / (gridZValue-1);
                         counter = gridJson.length;
                         counterFirst = counter-1;
 
@@ -170,7 +167,7 @@
                         
                         //Make clone of grid in other side
                         if(gridZValue > 1) {
-                            makeCloneOfGrid(yDiff, xDiff);
+                            makeCloneOfGrid(yDiff, xDiff, zDiff);
                         }
                     }
                     if(saveLast.y != mainGridJson[i].y){
@@ -197,11 +194,11 @@
      * @param {float} yDiff 
      * @param {float} xDiff 
      */
-    function makeCloneOfGrid(yDiff, xDiff){
+    function makeCloneOfGrid(yDiff, xDiff, zDiff){
         counter = gridJson.length-1;
         let beginX, beginY, beginZ;
         for (let i = 1; i <= (gridXValue); i++) {
-            counter = changeGridCoordinatesSide(counter);
+            counter = changeGridCoordinatesSideSubstract(counter, zDiff, yDiff);//substract
             beginX = gridJson[counter].x;
             beginY = gridJson[counter].y;
             beginZ = gridJson[counter].z;
@@ -212,8 +209,8 @@
                 counter = subtractDifferenceOfYCoordinates(counter, yDiff);
                 counter = addCoordinatesToWireMiddle(counter+1);
                 counter--;
-                counter = changeGridCoordinatesSide(counter);
-                counter = changeGridCoordinatesSide(counter);
+                counter = changeGridCoordinatesSide(counter, zDiff, yDiff);
+                counter = changeGridCoordinatesSideSubstract(counter, zDiff, yDiff);//substract
 
                 if(i > 0 && i != gridXValue){//paeiti i desne
                     counter = subtractDifferenceOfXCoordinates(counter, xDiff);
@@ -224,7 +221,7 @@
             counter++;
             if(i != gridXValue){//paeiti i desne
                 counter = subtractDifferenceOfXCoordinates(counter, xDiff);
-                counter = changeGridCoordinatesSide(counter);
+                counter = changeGridCoordinatesSide(counter, zDiff, yDiff);
             }
         }
 
@@ -325,12 +322,23 @@
         counter++;
         return counter;
     }
-
-    function changeGridCoordinatesSide(counter){
+    function changeGridCoordinatesSide(counter, zDiff, yDiff, add){
         gridJson[counter+1] = {"x": gridJson[counter].x, "y": gridJson[counter].y, "z": gridJson[counter].z*(-1)};
         counter++;
         return counter;
     }
+
+    function changeGridCoordinatesSideSubstract(counter, zDiff, yDiff){
+        for (let i = 1; i <= (gridZValue-1); i++) {
+            gridJson[counter+1] = {"x": gridJson[counter].x, "y": gridJson[counter].y, "z": gridJson[counter].z-zDiff};
+            counter++;
+            counter = addCoordinatesToWireMiddle(counter+1);
+            counter--;
+        }
+
+        return counter;
+    }
+
 
     function subtractDifferenceOfYCoordinates(counter, yDiff){
         gridJson[counter+1] = {"x": gridJson[counter].x, "y": gridJson[counter].y-yDiff, "z": gridJson[counter].z};
@@ -360,9 +368,10 @@
     function drawWire(wireGeometry){
         wireJson.forEach(function(cord) {
             wirePositions.push( cord.x, cord.y, cord.z );
-            wireColors.push(0x999999);
-            wireColors.push(0x999999);
-            wireColors.push(0x999999);
+            let color = new THREE.Color( 'red' );
+            wireColors.push(0xff0000);
+            wireColors.push(color);
+            wireColors.push(color);
         });
 
         wireGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( wirePositions, 3 ) );
@@ -380,6 +389,13 @@
      * @param {object} gridGeometry 
      */
     function drawGrid(gridGeometry){
+        let max = Math.max(...BMaxArr);
+        for(let i = 0; i < gridCounter.length; i++){
+            gridJson[gridCounter[i]].x /= max/(100);
+            gridJson[gridCounter[i]].y /= max/(100);
+            gridJson[gridCounter[i]].z /= max/(100);
+        }
+
         gridJson.forEach(function(cord) {
             gridPositions.push( cord.x, cord.y, cord.z );
             gridColors.push(0x222222);
