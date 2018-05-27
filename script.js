@@ -61,7 +61,9 @@
             B.z += (dB.z);
 
         }
-        
+        B.x = 1;
+        B.y = 1;
+        B.z = 1;
         gridJson[counter] = {"x": B.x, "y": B.y, "z": B.z};
         gridCounter.push(counter);
         counter++;
@@ -154,35 +156,50 @@
         if(gridXValue != 0 && gridYValue != 0 && gridZValue != 0){
             let saveLast = {}, counter, counterFirst;
             let xDiff, yDiff, zDiff;
-            for (var i = 0; i < mainGridJson.length; i++) {
-                if( i > 0 ){
-                    if(saveLast.x != mainGridJson[i].x){
+            counter = gridJson.length;
+            console.log(counter);
+            let sk = 60;
+            gridJson.push({x: 60, y: 60, z: 60});
 
-                        xDiff = (mainGridJson[i].x - saveLast.x) / (gridXValue-1);    
-                        zDiff = (mainGridJson[i].z + saveLast.z) / (gridZValue-1);
-                        counter = gridJson.length;
-                        counterFirst = counter-1;
+            for ( var x = 0 ; x <= gridXValue; x++ ){
+                for ( var y = 0 ; y <= gridYValue; y++ ){
+                    //gridJson.push({x: gridJson[gridJson.length], y: sk, z: gridJson[gridJson.length]});
+                    for ( var z = 0 ; z <= gridZValue ; z++){
+                        gridJson.push({"x": x*0.2, "y": y*0.2, "z": z*0.2});
+                    }
+                }
+                sk+=20;
+                gridJson.push({x: sk, y: gridJson[gridJson.length-3], z: gridJson[gridJson.length-3]});
+            }
+            // for (var i = 0; i < mainGridJson.length; i++) {
+            //     if( i > 0 ){
+            //         if(saveLast.x != mainGridJson[i].x){
 
-                        collectGridXCoordinates(counter, counterFirst, xDiff, yDiff);
+            //             xDiff = (mainGridJson[i].x - saveLast.x) / (gridXValue-1);    
+            //             zDiff = (mainGridJson[i].z + saveLast.z) / (gridZValue-1);
+            //             counter = gridJson.length;
+            //             counterFirst = counter-1;
+
+            //             collectGridXCoordinates(counter, counterFirst, xDiff, yDiff);
                         
-                        //Make clone of grid in other side
-                        if(gridZValue > 1) {
-                            makeCloneOfGrid(yDiff, xDiff, zDiff);
-                        }
-                    }
-                    if(saveLast.y != mainGridJson[i].y){
-                        counter = gridJson.length;
-                        counterFirst = counter-1;
-                        yDiff = (mainGridJson[i].y - saveLast.y) / (gridYValue-1);
-                        collectGridYCoordinates(counter, counterFirst, yDiff);
-                        saveLast = mainGridJson[i];
-                    }
-                }
-                else{
-                    gridJson.push(mainGridJson[i]);
-                    saveLast = mainGridJson[i];
-                }
-            };
+            //             //Make clone of grid in other side
+            //             if(gridZValue > 1) {
+            //                 makeCloneOfGrid(yDiff, xDiff, zDiff);
+            //             }
+            //         }
+            //         if(saveLast.y != mainGridJson[i].y){
+            //             counter = gridJson.length;
+            //             counterFirst = counter-1;
+            //             yDiff = (mainGridJson[i].y - saveLast.y) / (gridYValue-1);
+            //             collectGridYCoordinates(counter, counterFirst, yDiff);
+            //             saveLast = mainGridJson[i];
+            //         }
+            //     }
+            //     else{
+            //         gridJson.push(mainGridJson[i]);
+            //         saveLast = mainGridJson[i];
+            //     }
+            // }
         }
     }
 
@@ -389,22 +406,24 @@
      * @param {object} gridGeometry 
      */
     function drawGrid(gridGeometry){
+/*
         let max = Math.max(...BMaxArr);
         for(let i = 0; i < gridCounter.length; i++){
             gridJson[gridCounter[i]].x /= max/(100);
             gridJson[gridCounter[i]].y /= max/(100);
             gridJson[gridCounter[i]].z /= max/(100);
         }
-
+*/
         gridJson.forEach(function(cord) {
-            gridPositions.push( cord.x, cord.y, cord.z );
+            gridPositions.push( cord.x*100, cord.y*100, cord.z*100 );
+            gridPositions.push( cord.x*100+Math.random()*50., cord.y*100+Math.random()*50., cord.z*100+Math.random()*50. );
             gridColors.push(0x222222);
             gridColors.push(0x222222);
             gridColors.push(0x222222);
         });
 
-        gridGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( gridPositions, 3 ) );
-        gridGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( gridColors, 3 ) );
+        gridGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( gridPositions, 2 ) );
+        gridGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( gridColors, 2 ) );
         gridGeometry.computeBoundingSphere();
 
         return gridGeometry;
